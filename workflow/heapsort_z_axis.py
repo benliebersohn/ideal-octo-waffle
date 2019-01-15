@@ -14,6 +14,11 @@
 #	input: the user-defined outlet, TIN.vtk file
 #	output: an unstructured surface mesh which has filled-in pits
 
+#	TODO: make a thing that records if a point was visited before
+#	    : make recursive neighbor finding
+#           : change the if(cells or points) to a case statement
+#           : merge loops ln 100 and lists on ln120
+
 in_file = open('test.vtk', 'r')
 section = "<none>" #default placeholder
 pointDict = {}
@@ -112,22 +117,24 @@ for point in pointDict: #could this loop be merged with line 100? currently
 
 sortedList = (sorted(elevationDict.items(), key=lambda x:x[1])) #how can this be filled if we merged lines 95 and line 114?
 
-sortedElevation = sorted(elevationDict.items(), key=lambda x:x[1])
+sortedElevation = sorted(elevationDict.items(), key=lambda x:x[1]) #are sortedList and sortedElevation merge-able?
 
 for point in pointDict: #print neighbors and their elevations sorted by elevation. can this be merged with line 95? see line 101 for issues
 	neighborDict = pointDict[point]["neighbors"]
 	nodeElevation = getNodeDict(pointDict, point)
-
+	
 	print("node elevation:",nodeElevation)
-
+	
 	print("node", point,"neighbors")
 	for item in range(len(neighborDict)):
 		myNeighbor = (getNeighborElevation(neighborDict[item]))
 		myNeighborID = myNeighbor[0]
 		myNeighborElevation = myNeighbor[1]
-
+		
 		#if neighborElevation[1] < nodeElevation:
 		print("myNeighborID:",myNeighborID,", myNeighborElevation:",myNeighborElevation) #testing comparisons
+		secondaryNeighbor = getNeighbors(myNeighborID) #?? inspects a neighbor and look's at the neighbor's neighbors. this will be a recursive function soon! very important.
+		print("secondaryNeighbor: ", secondaryNeighbor)
 	continue
 
 print("complete")
