@@ -22,7 +22,7 @@
 in_file = open('test.vtk', 'r')
 section = "<none>" #default placeholder
 pointDict = {}
-visited = {}
+visited = []
 
 outletID = 3 #dummmy outlet for testing
 
@@ -107,8 +107,25 @@ def computeNeighbor(neighborDict):
         myNeighborID = myNeighbor[0]
         myNeighborElevation = myNeighbor[1]
 
-        print("NeighborID",myNeighborID,"NeighborElevation:",myNeighborElevation)
+        #print("NeighborID",myNeighborID,"NeighborElevation:",myNeighborElevation)
 
+def traverse(outlet, pointDict):
+    visited.append(outlet)
+    for point in pointDict:
+
+        neighbors = pointDict[point]["neighbors"]
+        elevation = pointDict[point]["z"]
+
+        print("Point: ",point, "elevation:", elevation, "neighbors: ", neighbors[1])
+        point = neighbors
+        continue
+
+    traverse(neighbors[1], pointDict) #recursion!!! wowie!
+
+      #  for neighborID in neighbors:
+       #     elevation = pointDict[neighborID]["z"]
+          #  print("neighbors: ",neighborID, elevation)
+        #    continue
 
 #    read in file by section: CELLS or POINTS
 for line in in_file:
@@ -126,26 +143,43 @@ sortedList = (sorted(elevationDict.items(), key=lambda x:x[1])) #how can this be
 
 sortedElevation = sorted(elevationDict.items(), key=lambda x:x[1]) #are sortedList and sortedElevation merge-able?
 
+traverse(outletID, pointDict)
+
 for point in pointDict: #print neighbors and their elevations sorted by elevation. can this be merged with line 95? see line 101 for issues
+
     neighborDict = pointDict[point]["neighbors"]
     elevation = pointDict[point]["z"]
-#    pointElevation = getNeighborElevation(pointDict[point]["z"])
+    pointElevation = pointDict[point]["z"]
+#    print(pointElevation)
+#    print("Point:", point, "elevation:",elevation)
+   # print(point, neighborDict)
     
-    print("Point:", point, "elevation:",elevation)
-    for item in range(len(neighborDict)):
-        myNeighbor = (getNeighborElevation(neighborDict[item]))
+    for neighbor in range(len(neighborDict)):
+        thisPoint = pointDict[neighbor]
+        myNeighbor = (getNeighborElevation(neighborDict[neighbor]))
         myNeighborID = myNeighbor[0]
+
         myNeighborElevation = myNeighbor[1]
         
+        if myNeighborID == 3:
+            if elevation > myNeighborElevation:
+                visited.append(pointDict[neighbor]) #counter +1 = the ID
+     #           print("elevation!",elevation)
+
+        
         #if neighborElevation[1] < pointElevation:
-        print("Neighbor ID:",myNeighborID,", Neighbor Elevation:",myNeighborElevation) #testing comparisons
+  #      print("Neighbor ID:",myNeighborID,", Neighbor Elevation:",myNeighborElevation) #testing comparisons
         secondaryNeighbor = getNeighbors(myNeighborID) #?? inspects a neighbor and look's at the neighbor's neighbors. this will be a recursive function soon! very important.
-        print("    secondaryNeighbor: ", secondaryNeighbor)
+   #     print("    secondaryNeighbor: ", secondaryNeighborID)
         
         for id in range(len(secondaryNeighbor)): #subloop loops over SECONDARY neighbors (this needs to be recursive?)
-            secondaryNeighborElevation = (secondaryNeighbor[id])
-            print("        Secondary Neighbor: ",secondaryNeighborElevation)
-            continue
+            secondaryNeighborSet = getNeighborElevation((secondaryNeighbor[id]))
+            secondaryNeighborID = secondaryNeighborSet[0]
+            secondaryNeighborElevation = secondaryNeighborSet[1]
+
+            #
+             #   print("        Secondary Neighbor: ",secondaryNeighborSet[0], "Secondary Neighbor Elevation: ", secondaryNeighborSet[1])
+            #continue
     continue
 
 print("complete")
