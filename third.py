@@ -28,12 +28,13 @@ def condition(points, outletID):
 
     # loop over elevation list from small to large
     counter = 0
-    #while len(elev) is not 0:
-    while (counter) < 100:
+    while len(elev) is not 0:
+    #while (counter) < 1:
         #print("counter",counter, "len(elev):",len(elev))
         counter += 1
-        current, current_p = elev.pop(0)
-       # print("current",current, "waterway",waterway)
+        current, current_p = elev.pop(0) # for some reason we get stuck at pop for elev[21] aka 22
+        print("len",len(elev))
+        #print("current",current, "waterway",waterway)
         if current in waterway:
             # still in the waterway
             #print("current_p.neighbors: ",current_p.neighbors)
@@ -48,9 +49,10 @@ def condition(points, outletID):
             ww_neighbors = []
             for n in range(len(current_p.neighbors)):
                 if current_p.neighbors[n] in waterway:
+                    print("add to ww")
                     ww_neighbors += current_p.neighbors[n]
             #ww_neighbors = [n for n in current_p.neighbors if n in waterway]
-            print("ww_neighbors",ww_neighbors)
+            #print("ww_neighbors",ww_neighbors)
             if len(ww_neighbors) != 0:
                 #print("this")
                 current_p.coords[2] = min(points[n].coords[2] for n in ww_neighbors)
@@ -61,18 +63,18 @@ def condition(points, outletID):
                     neighboring_values += current_p.neighbors
                     
                 min_neighbor_id = min(neighboring_values)
-                print
+                
                 min_neighbor_value_pre = find_neighbor.GetValue(min_neighbor_id)
 
                 min_neighbor_value = str(min_neighbor_value_pre)[1:-1]
 
 
-                print("current_p.coords[2]", current_p, "we wish to change that to:", [min_neighbor_value])
+               # print("current_p.coords[2]", current_p, "we wish to change that to:", [min_neighbor_value])
                 current_p.coords[2] = min_neighbor_value
                 #current_p.coords[2] = min(points[n].coords[2] for n in current_p.neighbors)
-            
+                print("ADDING BACK TO ELEV")
             # push back into elev list with new, higher elevation
-            elev.add( (current,current_p) )
+                elev.add( (current,current_p) )
     return
 
 
@@ -110,4 +112,3 @@ if __name__ == "__main__":
 #    print(test_input)
 #    print(input_list)
     run_test_1D(test_input, [0,1,3,3,3,4])
-
