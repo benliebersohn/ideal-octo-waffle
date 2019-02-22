@@ -1,6 +1,7 @@
 This is a merge of some of the codes: condition.py and find_neighbor.py
 
 The main issue is that it is currently stuck at iteration 22:
+``
 u7l@u7l:~/Downloads/ideal-octo-waffle$ python3 third.py
 ww_neighbors []
 current_p.coords[2] Point(coords=array([  1.        ,   0.        , 674.30761719]), neighbors=[9982, 9854, 9980, 9333]) we wish to change that to: ['1137.207275390625']
