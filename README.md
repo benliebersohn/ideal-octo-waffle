@@ -1,99 +1,69 @@
-Workflow for building HUC-based meshes in python.
+This is a merge of some of the codes: condition.py and find_neighbor.py
 
-Installation and Setup
-========================
-All code is in python3.  Recommended is to download anaconda3, as this
-makes it fairly easy to get all the required packages.
-
-Note that this package expects you to place the top-level directory in your PYTHONPATH:
-
-    export PYTHONPATH=`pwd`:${PYTHONPATH}
-
-Required Packages
--------------------
-
-Standard packages needed (should be included in all distributions?) include argparse and subprocess, and for testing, pytest and dist_utils.
-Standard math packages include numpy, matplotlib, and scipy.
-
-GIS work uses packages: fiona, rasterio, and shapely.
-The packages for fiona and rasterio from conda-forge seem to work better?
-
-    conda install -c conda-forge fiona
-    conda install -c conda-forge rasterio
-    conda install shapely
-
-Mesh generation uses Triangle, which can be wrapped for python using
-meshpy.  This one is a little more difficult, as there seem to be no
-good distributions of it?
-
-
-Note this depends upon boost python, which seems to come by default
-with anaconda?
-
-For now, build from source:
-
-     export ANACONDA_DIR=/path/to/your/anaconda
-     export BOOST_ROOT=${ANACONDA_DIR}
-     git clone https://github.com/ecoon/meshpy.git
-     cd meshpy
-     ./configure.py --python-exe=${ANACONDA_DIR}/bin/python --boost-inc-dir=${ANACONDA_DIR}/include  --boost-lib-dir=${ANACONDA_DIR}/lib --boost-python-libname=boost_python3  --disable-static --enable-shared --cxxflags=-stdlib=libc++ --ldflags=-stdlib=libc++
-     make
-     python setup.py install
-
-Note to look closely at the result of the configure command -- it
-errors frequently and has trouble finding Boost?
-
-Check your python installation:
-
-     $> ipython
-     import numpy as np
-     import matplotlib as plt
-     import scipy
-     import rasterio
-     import fiona
-     import shapely
-     import meshpy.triangle
-
-
-Alternate Setup
-==================
-Alternative, use a docker container.
-
-On a mac:
-     docker build -t ats-meshing -f ./Dockerfile ./
-
-     brew install socat
-     nohup socat TCP-LISTEN:6000,reuseaddr,fork UNIX-CLIENT:\"$DISPLAY\"
-     IP=$(ifconfig en0 | grep inet | awk '$1=="inet" {print $2}')
-     docker run -it --name container1 --net=host --env DISPLAY=${IP}:0  -v ~/codes/ats/ats-meshing/:/ats ats-meshing
-     cd ats-meshing
-
-
-A first example
-----------------
-
-A good way to get started is to simply run go:
-
-    python3 bin/mesh_hucs.py -c 060102080102
-
-This downloads a HUC file (not small, so takes a minute) then
-extracts, smooths, and triangulates some HUCs in it.
-
-A set of examples
--------------------
-
-Basic triangulation of an existing HUC 12:
-
-    python3 bin/mesh_hucs.py -c 060102080102
-
-Triangulate a HUC 10, ensuring that HUC12 edges are included:
-
-    python3 bin/mesh_hucs.py -c 0601020801
-
-Triangulate with refinement, grading the max area to higher res near the river:
-
-    python3 bin/mesh_hucs.py --refine-distance 0 1000 1000 10000 -c 060102080102
-
-Triangulate a given user-provided shapefile, for instance a subwatershed from the Coweeta basin:
-
-    python3 bin/mesh_shape.py --refine-distance 10 100 1000 1000 --hint=06 --center --shape-index=0 data/hydrologic_units/others/Coweeta/coweeta_subwatersheds.shp            
+The main issue is that it is currently stuck at iteration 22:
+u7l@u7l:~/Downloads/ideal-octo-waffle$ python3 third.py
+ww_neighbors []
+current_p.coords[2] Point(coords=array([  1.        ,   0.        , 674.30761719]), neighbors=[9982, 9854, 9980, 9333]) we wish to change that to: ['1137.207275390625']
+ww_neighbors []
+current_p.coords[2] Point(coords=array([  2.        ,   0.        , 674.51672363]), neighbors=[9639, 9643, 10235, 9981, 9854, 9642]) we wish to change that to: ['1065.8074951171875']
+ww_neighbors []
+current_p.coords[2] Point(coords=array([  3.        ,   0.        , 675.26403809]), neighbors=[10565, 10189, 9492, 9642]) we wish to change that to: ['1090.7086181640625']
+ww_neighbors []
+current_p.coords[2] Point(coords=array([  4.        ,   0.        , 675.86022949]), neighbors=[9468, 10229, 10333, 10422, 9492]) we wish to change that to: ['1050.1622314453125']
+ww_neighbors []
+current_p.coords[2] Point(coords=array([  5.       ,   0.       , 675.9732666]), neighbors=[10709, 10782, 9913, 10010, 10059, 10783]) we wish to change that to: ['1042.22021484375']
+ww_neighbors []
+current_p.coords[2] Point(coords=array([  6.        ,   0.        , 676.04473877]), neighbors=[9441, 7157, 10009, 10057, 9913]) we wish to change that to: ['1000.1617431640625']
+ww_neighbors []
+current_p.coords[2] Point(coords=array([  7.        ,   0.        , 676.19445801]), neighbors=[10263, 9941, 9783]) we wish to change that to: ['1056.510986328125']
+ww_neighbors []
+current_p.coords[2] Point(coords=array([  8.        ,   0.        , 676.53924561]), neighbors=[9784, 7167, 8346, 9525, 9523]) we wish to change that to: ['994.9834594726562']
+ww_neighbors []
+current_p.coords[2] Point(coords=array([  9.        ,   0.        , 676.59838867]), neighbors=[10620, 10, 10339, 9523, 9524]) we wish to change that to: ['1000.7391967773438']
+ww_neighbors []
+current_p.coords[2] Point(coords=array([ 10.        ,   0.        , 676.66387939]), neighbors=[9, 10620, 11, 10717, 10718]) we wish to change that to: ['996.5765380859375']
+ww_neighbors []
+current_p.coords[2] Point(coords=array([ 11.        ,   0.        , 676.78656006]), neighbors=[10717, 10716, 12, 10]) we wish to change that to: ['1000.7391967773438']
+ww_neighbors []
+current_p.coords[2] Point(coords=array([ 12.        ,   0.        , 677.08416748]), neighbors=[10588, 10713, 10716, 10715, 11]) we wish to change that to: ['967.9291381835938']
+ww_neighbors []
+current_p.coords[2] Point(coords=array([ 13.        ,   0.        , 677.28723145]), neighbors=[10594, 10715, 10724]) we wish to change that to: ['928.8251342773438']
+ww_neighbors []
+current_p.coords[2] Point(coords=array([ 14.        ,   0.        , 677.36322021]), neighbors=[10593, 10722, 10723, 10724]) we wish to change that to: ['894.5525512695312']
+ww_neighbors []
+current_p.coords[2] Point(coords=array([ 15.        ,   0.        , 677.37072754]), neighbors=[10605, 10601, 10607, 10493, 10722]) we wish to change that to: ['900.8527221679688']
+ww_neighbors []
+current_p.coords[2] Point(coords=array([ 16.        ,   0.        , 677.40075684]), neighbors=[10493, 10604, 17]) we wish to change that to: ['883.89697265625']
+ww_neighbors []
+current_p.coords[2] Point(coords=array([ 17.        ,   0.        , 677.57696533]), neighbors=[16, 10604, 10603]) we wish to change that to: ['894.6546020507812']
+ww_neighbors []
+current_p.coords[2] Point(coords=array([ 18.       ,   0.       , 677.7076416]), neighbors=[10545, 10550, 10359, 19]) we wish to change that to: ['717.2388305664062']
+ww_neighbors []
+current_p.coords[2] Point(coords=array([ 19.        ,   0.        , 677.96710205]), neighbors=[10359, 18, 10246, 10358, 10561, 10559]) we wish to change that to: ['726.559326171875']
+ww_neighbors []
+current_p.coords[2] Point(coords=array([ 20.        ,   0.        , 677.99377441]), neighbors=[10559, 10560, 8564, 21]) we wish to change that to: ['687.630126953125']
+ww_neighbors []
+current_p.coords[2] Point(coords=array([ 21.        ,   0.        , 678.01629639]), neighbors=[8563, 210, 8564, 20]) we wish to change that to: ['700.0861206054688']
+ww_neighbors []
+current_p.coords[2] Point(coords=array([ 22.        ,   0.        , 678.05603027]), neighbors=[210, 2010, 23]) we wish to change that to: ['677.2872314453125']
+ww_neighbors []
+current_p.coords[2] Point(coords=array([ 22.        ,   0.        , 677.28723145]), neighbors=[210, 2010, 23]) we wish to change that to: ['677.2872314453125']
+ww_neighbors []
+current_p.coords[2] Point(coords=array([ 22.        ,   0.        , 677.28723145]), neighbors=[210, 2010, 23]) we wish to change that to: ['677.2872314453125']
+ww_neighbors []
+current_p.coords[2] Point(coords=array([ 22.        ,   0.        , 677.28723145]), neighbors=[210, 2010, 23]) we wish to change that to: ['677.2872314453125']
+ww_neighbors []
+current_p.coords[2] Point(coords=array([ 22.        ,   0.        , 677.28723145]), neighbors=[210, 2010, 23]) we wish to change that to: ['677.2872314453125']
+ww_neighbors []
+current_p.coords[2] Point(coords=array([ 22.        ,   0.        , 677.28723145]), neighbors=[210, 2010, 23]) we wish to change that to: ['677.2872314453125']
+ww_neighbors []
+current_p.coords[2] Point(coords=array([ 22.        ,   0.        , 677.28723145]), neighbors=[210, 2010, 23]) we wish to change that to: ['677.2872314453125']
+ww_neighbors []
+current_p.coords[2] Point(coords=array([ 22.        ,   0.        , 677.28723145]), neighbors=[210, 2010, 23]) we wish to change that to: ['677.2872314453125']
+ww_neighbors []
+current_p.coords[2] Point(coords=array([ 22.        ,   0.        , 677.28723145]), neighbors=[210, 2010, 23]) we wish to change that to: ['677.2872314453125']
+ww_neighbors []
+current_p.coords[2] Point(coords=array([ 22.        ,   0.        , 677.28723145]), neighbors=[210, 2010, 23]) we wish to change that to: ['677.2872314453125']
+ww_neighbors []
+current_p.coords[2] Point(coords=array([ 22.        ,   0.        , 677.28723145]), neighbors=[210, 2010, 23]) we wish to change that to: ['677.2872314453125']
+ww_neighbors []
