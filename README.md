@@ -68,3 +68,4 @@ current_p.coords[2] Point(coords=array([ 22.        ,   0.        , 677.28723145
 ww_neighbors []
 current_p.coords[2] Point(coords=array([ 22.        ,   0.        , 677.28723145]), neighbors=[210, 2010, 23]) we wish to change that to: ['677.2872314453125']
 ww_neighbors []
+``
